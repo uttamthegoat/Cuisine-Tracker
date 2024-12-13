@@ -1,21 +1,31 @@
-import { useEffect, useState } from 'react';
-import { fetchCategories } from '../utils/api';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { 
+    fetchCategoriesAsync, 
+    selectAllCategories, 
+    selectCategoryStatus, 
+    selectCategoryError 
+} from '../store/slices/categorySlice';
 
 const CategoryList = () => {
-    const [categories, setCategories] = useState([]);
+    const dispatch = useDispatch();
+    const categories = useSelector(selectAllCategories);
+    const status = useSelector(selectCategoryStatus);
+    const error = useSelector(selectCategoryError);
 
     useEffect(() => {
-        const getCategories = async () => {
-            try {
-                const response = await fetchCategories();
-                setCategories(response.data);
-                console.log(response)
-            } catch (error) {
-                console.error('Error fetching categories:', error);
-            }
-        };
-        getCategories();
-    }, []);
+        if (status === 'idle') {
+            dispatch(fetchCategoriesAsync());
+        }
+    }, [status, dispatch]);
+
+    if (status === 'loading') {
+        return <div className="text-center py-4">Loading...</div>;
+    }
+
+    if (status === 'failed') {
+        return <div className="text-red-500 text-center py-4">Error: {error}</div>;
+    }
 
     return (
         <div>
@@ -26,7 +36,6 @@ const CategoryList = () => {
                         {category.category_title}
                         <ul>
                             <li>Cuisines: {category.cuisines.map(c => c.cuisine_title).join(', ')}</li>
-                            {/* <li>Subcategories: {category.subcategories.map(s => s.subcategory_title).join(', ')}</li> */}
                         </ul>
                     </li>
                 ))}

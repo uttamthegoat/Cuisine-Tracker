@@ -89,8 +89,21 @@ class CategoryView(APIView):
 
 class SubcategoryView(APIView):
     def get(self, request):
-        subcategories = Subcategory.objects.all()
+        subcategories = Subcategory.objects.prefetch_related('categories').all()
+
         serializer = SubcategorySerializer(subcategories, many=True)
+
+        for subcategory in subcategories:
+            print(f"\nSubcategory: {subcategory.subcategory_title}")
+            print(f"Categories: {subcategory.categories.all()}")
+            print(f"Category IDs: {[c.id for c in subcategory.categories.all()]}")
+            print(f"Category Titles: {[c.category_title for c in subcategory.categories.all()]}")
+
+        print(f"\n===Serialized Data===")
+        for subcategory in serializer.data:
+            print(f"\nSubcategory: {subcategory['subcategory_title']}")
+            print(f"Serialized categories: {subcategory['categories']}")
+        
         return Response(serializer.data)
 
     def post(self, request):
