@@ -32,7 +32,8 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
     final cuisines = await _apiService.fetchCuisines();
     final subcategories = await _apiService.fetchSubcategories();
     setState(() {
-      _availableCuisines = cuisines.map((c) => CuisineModel.fromJson(c)).toList();
+      _availableCuisines =
+          cuisines.map((c) => CuisineModel.fromJson(c)).toList();
       _availableSubcategories = subcategories;
     });
   }
@@ -46,18 +47,59 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
     }
   }
 
+  Future<void> _submitForm() async {
+    if (_formKey.currentState!.validate()) {
+      if (_image == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select an image')),
+        );
+        return;
+      }
+
+      try {
+        setState(() {
+          // Show loading indicator if needed
+        });
+
+        await _apiService.createCategory(
+          title: _titleController.text,
+          imagePath: _image!.path,
+          cuisineIds: _selectedCuisineIds,
+          subcategoryIds: _selectedSubcategoryIds,
+        );
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Category created successfully')),
+        );
+
+        // Navigate back
+        Navigator.pop(context, true);
+      } catch (e) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create category: $e')),
+        );
+      } finally {
+        setState(() {
+          // Hide loading indicator if needed
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Add Category')),
+      appBar: AppBar(title: const Text('Add Category')),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           children: [
             TextFormField(
               controller: _titleController,
-              decoration: InputDecoration(labelText: 'Title'),
+              decoration: const InputDecoration(labelText: 'Title'),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter a title';
@@ -65,7 +107,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                 return null;
               },
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             if (_image != null)
               Image.file(
                 File(_image!.path),
@@ -74,9 +116,9 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
               ),
             ElevatedButton(
               onPressed: _pickImage,
-              child: Text('Select Image'),
+              child: const Text('Select Image'),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             DropDownMultiSelect(
               onChanged: (List<String> selected) {
                 setState(() {
@@ -94,8 +136,15 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                       .cuisineTitle)
                   .toList(),
               whenEmpty: 'Select Cuisines',
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+              ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             DropDownMultiSelect(
               onChanged: (List<String> selected) {
                 setState(() {
@@ -113,8 +162,15 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                       .title)
                   .toList(),
               whenEmpty: 'Select Subcategories',
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+              ),
             ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () async {
                 if (_formKey.currentState!.validate()) {
@@ -128,12 +184,12 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
                     Navigator.pop(context);
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to create category')),
+                      const SnackBar(content: Text('Failed to create category')),
                     );
                   }
                 }
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         ),

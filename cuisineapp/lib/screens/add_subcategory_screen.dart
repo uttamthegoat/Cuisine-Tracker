@@ -37,30 +37,32 @@ class _AddSubcategoryScreenState extends State<AddSubcategoryScreen> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      if (_selectedCategoryIds.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select at least one category')),
-        );
-        return;
-      }
-
-      setState(() {
-        _isLoading = true;
-      });
 
       try {
+        setState(() {
+          // Show loading indicator if needed
+        });
+
         await _apiService.createSubcategory(
           title: _titleController.text,
           categoryIds: _selectedCategoryIds,
         );
-        Navigator.pop(context);
-      } catch (e) {
+
+        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to create subcategory')),
+          const SnackBar(content: Text('Cuisine created successfully')),
+        );
+
+        // Navigate back
+        Navigator.pop(context, true);
+      } catch (e) {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create cuisine: $e')),
         );
       } finally {
         setState(() {
-          _isLoading = false;
+          // Hide loading indicator if needed
         });
       }
     }

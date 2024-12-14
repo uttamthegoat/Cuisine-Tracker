@@ -20,6 +20,7 @@ class CuisineSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         print(f"validated_data: {validated_data}")
         category_ids = validated_data.pop('category_ids', [])
+        print(f"category_ids: {category_ids}")
         category_ids = category_ids[0]
         cuisine = Cuisine.objects.create(**validated_data)
         cuisine.categories.set(category_ids)
