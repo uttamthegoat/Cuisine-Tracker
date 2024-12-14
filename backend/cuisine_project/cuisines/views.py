@@ -7,12 +7,26 @@ import json
 
 class CuisineView(APIView):
     def get(self, request):
-        cuisines = Cuisine.objects.all()
+        cuisines = Cuisine.objects.prefetch_related(
+            'categories',
+        ).all()
         serializer = CuisineSerializer(cuisines, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = CuisineSerializer(data=request.data)
+        print(f"request.data: {request.data}")
+
+        data = request.data.copy()
+
+        if 'category_ids' in data:
+            try:
+                category_ids = json.loads(data.get('category_ids', '[]'))
+                data['category_ids'] = [int(id_) for id_ in category_ids if id_]
+                print(f"category_ids: {data['category_ids']}")
+            except json.JSONDecodeError:
+                data['category_ids'] = []
+
+        serializer = CuisineSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -26,19 +40,6 @@ class CategoryView(APIView):
         ).all()
         
         serializer = CategorySerializer(categories, many=True)
-        
-        print("\n=== Category Relationships ===")
-        for category in categories:
-            print(f"\nCategory: {category.category_title}")
-            print(f"Raw cuisines query: {category.cuisines.all()}")
-            print(f"Cuisine IDs: {[c.id for c in category.cuisines.all()]}")
-            print(f"Cuisine Titles: {[c.cuisine_title for c in category.cuisines.all()]}")
-        
-        print("\n=== Serialized Data ===")
-        for category in serializer.data:
-            print(f"\nCategory: {category['category_title']}")
-            print(f"Serialized cuisines: {category['cuisines']}")
-        
         return Response(serializer.data)
 
     def post(self, request):
@@ -91,19 +92,7 @@ class SubcategoryView(APIView):
     def get(self, request):
         subcategories = Subcategory.objects.prefetch_related('categories').all()
 
-        serializer = SubcategorySerializer(subcategories, many=True)
-
-        for subcategory in subcategories:
-            print(f"\nSubcategory: {subcategory.subcategory_title}")
-            print(f"Categories: {subcategory.categories.all()}")
-            print(f"Category IDs: {[c.id for c in subcategory.categories.all()]}")
-            print(f"Category Titles: {[c.category_title for c in subcategory.categories.all()]}")
-
-        print(f"\n===Serialized Data===")
-        for subcategory in serializer.data:
-            print(f"\nSubcategory: {subcategory['subcategory_title']}")
-            print(f"Serialized categories: {subcategory['categories']}")
-        
+        serializer = SubcategorySerializer(subcategories, many=True)        
         return Response(serializer.data)
 
     def post(self, request):
