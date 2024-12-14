@@ -8,43 +8,7 @@ class ApiService {
   
   ApiService();
 
-// Cuisine methods
-  Future<List<dynamic>> fetchCuisines() async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/cuisines/'));
-      if (response.statusCode == 200) {
-        return json.decode(response.body) as List<dynamic>;
-      } else {
-        throw Exception('Failed to load cuisines');
-      }
-    } catch (e) {
-      throw Exception('Failed to load cuisines: $e');
-    }
-  }
 
-  Future<void> createCuisine({
-    required String title,
-    required String imagePath,
-    required List<int> categoryIds,
-  }) async {
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse('$baseUrl/cuisines/'),
-    );
-    
-    request.fields['cuisine_title'] = title;
-    request.fields['category_ids'] = jsonEncode(categoryIds);
-    request.files.add(await http.MultipartFile.fromPath('image', imagePath));
-    
-    print('Request fields: ${request.fields}');
-    
-    var response = await request.send();
-    if (response.statusCode != 201) {
-      final responseBody = await response.stream.bytesToString();
-      print('Error response: $responseBody');
-      throw Exception('Failed to create cuisine: $responseBody');
-    }
-  }
 
   // Category methods
   Future<List<dynamic>> fetchCategories() async {
@@ -86,7 +50,7 @@ class ApiService {
   }
 
   // Subcategory methods
-  Future<List<Subcategory>> fetchSubcategories() async {
+  Future<List<SubcategoryModel>> fetchSubcategories() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/subcategories/'));
       if (response.statusCode == 200) {
@@ -95,7 +59,7 @@ class ApiService {
         
         return jsonData.map((data) {
           try {
-            return Subcategory.fromJson(data as Map<String, dynamic>);
+            return SubcategoryModel.fromJson(data as Map<String, dynamic>);
           } catch (e) {
             print('Error parsing subcategory: $e');
             print('Problematic data: $data');

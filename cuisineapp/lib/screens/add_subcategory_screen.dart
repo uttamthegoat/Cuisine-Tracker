@@ -11,7 +11,7 @@ class AddSubcategoryScreen extends StatefulWidget {
 class _AddSubcategoryScreenState extends State<AddSubcategoryScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
-  List<Category> _availableCategories = [];
+  List<CategoryModel> _availableCategories = [];
   List<int> _selectedCategoryIds = [];
   final ApiService _apiService = ApiService();
   bool _isLoading = false;
@@ -26,7 +26,7 @@ class _AddSubcategoryScreenState extends State<AddSubcategoryScreen> {
     try {
       final categories = await _apiService.fetchCategories();
       setState(() {
-        _availableCategories = categories.map((c) => Category.fromJson(c)).toList();
+        _availableCategories = categories.map((c) => CategoryModel.fromJson(c)).toList();
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

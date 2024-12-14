@@ -19,7 +19,7 @@ class _AddCuisineScreenState extends State<AddCuisineScreen> {
   XFile? _image;
   final ImagePicker _picker = ImagePicker();
   final ApiService _apiService = ApiService();
-  List<Category> _availableCategories = [];
+  List<CategoryModel> _availableCategories = [];
 
   @override
   void initState() {
@@ -31,7 +31,7 @@ class _AddCuisineScreenState extends State<AddCuisineScreen> {
     final categories = await _apiService.fetchCategories();
     setState(() {
       _availableCategories =
-          categories.map((c) => Category.fromJson(c)).toList();
+          categories.map((c) => CategoryModel.fromJson(c)).toList();
       print('Available Categories:');
     for (var category in _availableCategories) {
         print('ID: ${category.id}, Title: ${category.title}');

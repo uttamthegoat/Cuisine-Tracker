@@ -18,14 +18,14 @@ class CategoryBasic {
   }
 }
 
-class Category {
+class CategoryModel {
   final int id;
   final String title;
   final String? imageUrl;
   late List<CuisineBasic> cuisines;
   late List<SubcategoryBasic> subcategories;
 
-  Category({
+  CategoryModel({
     required this.id,
     required this.title,
     this.imageUrl,
@@ -36,9 +36,9 @@ class Category {
     this.subcategories = subcategories ?? [];
   }
 
-  factory Category.fromJson(Map<String, dynamic> json) {
+  factory CategoryModel.fromJson(Map<String, dynamic> json) {
     try {
-      return Category(
+      return CategoryModel(
         id: json['id'] ?? 0,
         title: json['category_title'] ?? '',
         imageUrl: json['image'],

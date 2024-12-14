@@ -17,12 +17,12 @@ class SubcategoryBasic {
   }
 }
 
-class Subcategory {
+class SubcategoryModel {
   final int id;
   final String title;
   late List<CategoryBasic> categories;
 
-  Subcategory({
+  SubcategoryModel({
     required this.id,
     required this.title,
     List<CategoryBasic>? categories,
@@ -30,8 +30,8 @@ class Subcategory {
     this.categories = categories ?? [];
   }
 
-  factory Subcategory.fromJson(Map<String, dynamic> json) {
-    return Subcategory(
+  factory SubcategoryModel.fromJson(Map<String, dynamic> json) {
+    return SubcategoryModel(
       id: json['id'] ?? 0,
       title: json['subcategory_title'] ?? '',
       categories: (json['categories'] ?? []).map<CategoryBasic>((c) {

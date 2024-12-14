@@ -9,7 +9,7 @@ class SubcategoryListScreen extends StatefulWidget {
 }
 
 class _SubcategoryListScreenState extends State<SubcategoryListScreen> {
-  late Future<List<Subcategory>> _subcategoriesFuture;
+  late Future<List<SubcategoryModel>> _subcategoriesFuture;
   final ApiService _apiService = ApiService();
 
   @override
@@ -46,7 +46,7 @@ class _SubcategoryListScreenState extends State<SubcategoryListScreen> {
             _subcategoriesFuture = _apiService.fetchSubcategories();
           });
         },
-        child: FutureBuilder<List<Subcategory>>(
+        child: FutureBuilder<List<SubcategoryModel>>(
           future: _subcategoriesFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {

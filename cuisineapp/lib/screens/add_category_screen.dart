@@ -17,7 +17,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
   XFile? _image;
   final ImagePicker _picker = ImagePicker();
   List<CuisineModel> _availableCuisines = [];
-  List<Subcategory> _availableSubcategories = [];
+  List<SubcategoryModel> _availableSubcategories = [];
   List<int> _selectedCuisineIds = [];
   List<int> _selectedSubcategoryIds = [];
   final ApiService _apiService = ApiService();

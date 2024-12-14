@@ -9,7 +9,7 @@ class CategoryListScreen extends StatefulWidget {
 }
 
 class _CategoryListScreenState extends State<CategoryListScreen> {
-  late Future<List<Category>> _categoriesFuture;
+  late Future<List<CategoryModel>> _categoriesFuture;
   final ApiService _apiService = ApiService();
 
   @override
@@ -18,11 +18,11 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
     _categoriesFuture = _fetchCategories();
   }
 
-  Future<List<Category>> _fetchCategories() async {
+  Future<List<CategoryModel>> _fetchCategories() async {
     try {
       final response = await _apiService.fetchCategories();
       return (response as List)
-          .map((item) => Category.fromJson(item as Map<String, dynamic>))
+          .map((item) => CategoryModel.fromJson(item as Map<String, dynamic>))
           .toList();
     } catch (e) {
       print(e);
@@ -56,7 +56,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
             _categoriesFuture = _fetchCategories();
           });
         },
-        child: FutureBuilder<List<Category>>(
+        child: FutureBuilder<List<CategoryModel>>(
           future: _categoriesFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
