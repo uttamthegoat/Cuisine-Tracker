@@ -47,10 +47,14 @@ const CategoryForm = () => {
         }
 
         // Handle cuisine IDs
-        const cuisineIds = Array.isArray(data.cuisine_ids) 
+        if(data.cuisine_ids && data.cuisine_ids.length > 0) {
+            const cuisineIds = Array.isArray(data.cuisine_ids) 
             ? data.cuisine_ids.map(id => Number(id)) 
             : [];
-        formData.append('cuisine_ids', JSON.stringify(cuisineIds));
+            formData.append('cuisine_ids', JSON.stringify(cuisineIds));
+        } else {
+            formData.append('cuisine_ids', JSON.stringify([]));
+        }
 
         
         // Handle subcategory IDs
@@ -131,14 +135,14 @@ const CategoryForm = () => {
                     )}
                 </div>
 
-                {/* Cuisines Selection */}
+                {/* Cuisines Selection - Updated to be optional */}
                 <div>
                     <label htmlFor="cuisines" className="block text-sm font-medium text-gray-700">
-                        Select Cuisines
+                        Select Cuisines (Optional)
                     </label>
                     <select
                         id="cuisines"
-                        {...register('cuisine_ids', { required: 'At least one cuisine is required' })}
+                        {...register('cuisine_ids')}
                         multiple
                         className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                     >
@@ -148,9 +152,9 @@ const CategoryForm = () => {
                             </option>
                         ))}
                     </select>
-                    {errors.cuisine_ids && 
-                        <span className="text-red-500 text-sm">{errors.cuisine_ids.message}</span>
-                    }
+                    <p className="text-sm text-gray-500 mt-2">
+                        Hold down Ctrl (Windows) or Command (Mac) to select multiple options.
+                    </p>
                 </div>
 
                 {/* Subcategories Selection */}
