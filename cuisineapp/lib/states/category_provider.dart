@@ -13,6 +13,26 @@ class CategoryProvider with ChangeNotifier {
   String? get error => _error;
 
   Future<void> fetchCategories() async {
+    if (_categories.isNotEmpty) {
+      return;
+    }
+
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final response = await _apiService.fetchCategories();
+      _categories = response.map((item) => CategoryModel.fromJson(item)).toList();
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> refreshCategories() async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -36,7 +56,7 @@ class CategoryProvider with ChangeNotifier {
         cuisineIds: cuisineIds,
         subcategoryIds: subcategoryIds,
       );
-      await fetchCategories(); // Refresh the list
+      await refreshCategories(); // Refresh the list
     } catch (e) {
       _error = e.toString();
       notifyListeners();

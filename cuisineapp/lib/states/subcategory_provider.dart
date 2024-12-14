@@ -13,6 +13,26 @@ class SubcategoryProvider with ChangeNotifier {
   String? get error => _error;
 
   Future<void> fetchSubcategories() async {
+    if (_subcategories.isNotEmpty) {
+      return;
+    }
+
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final response = await _apiService.fetchSubcategories();
+      _subcategories = response;
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> refreshSubcategories() async {
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -34,7 +54,7 @@ class SubcategoryProvider with ChangeNotifier {
         title: title,
         categoryIds: categoryIds,
       );
-      await fetchSubcategories(); // Refresh the list
+      await refreshSubcategories(); // Refresh the list
     } catch (e) {
       _error = e.toString();
       notifyListeners();

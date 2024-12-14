@@ -8,7 +8,41 @@ class ApiService {
   
   ApiService();
 
+// Cuisine methods
+  Future<List<Map<String, dynamic>>> fetchCuisines() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/cuisines/'));
+      if (response.statusCode == 200) {
+        List<dynamic> jsonData = json.decode(response.body);
+        return List<Map<String, dynamic>>.from(jsonData);
+      } else {
+        throw Exception('Failed to load cuisines: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to load cuisines: $e');
+    }
+  }
 
+  Future<void> createCuisine({
+    required String title,
+    required String imagePath,
+    required List<int> categoryIds,
+  }) async {
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('$baseUrl/cuisines/'),
+    );
+    
+    request.fields['cuisine_title'] = title;
+    request.fields['category_ids'] = jsonEncode(categoryIds);
+    request.files.add(await http.MultipartFile.fromPath('image', imagePath));
+    
+    var response = await request.send();
+    if (response.statusCode != 201) {
+      final responseBody = await response.stream.bytesToString();
+      throw Exception('Failed to create cuisine: $responseBody');
+    }
+  }
 
   // Category methods
   Future<List<dynamic>> fetchCategories() async {

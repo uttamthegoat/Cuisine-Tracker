@@ -13,15 +13,32 @@ class CuisineProvider with ChangeNotifier {
   String? get error => _error;
 
   Future<void> fetchCuisines() async {
+    if(_cuisines.isNotEmpty) {
+      return;
+    }
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      final response = await _apiService.fetchCuisines();
-      _cuisines = (response as List)
-          .map((item) => CuisineModel.fromJson(item as Map<String, dynamic>))
-          .toList();
+      final List<Map<String, dynamic>> response = await _apiService.fetchCuisines();
+      _cuisines = response.map((item) => CuisineModel.fromJson(item)).toList();
+    } catch (e) {
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> refreshCuisines() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final List<Map<String, dynamic>> response = await _apiService.fetchCuisines();
+      _cuisines = response.map((item) => CuisineModel.fromJson(item)).toList();
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -37,7 +54,7 @@ class CuisineProvider with ChangeNotifier {
         imagePath: imagePath,
         categoryIds: categoryIds,
       );
-      await fetchCuisines(); // Refresh the list
+      await refreshCuisines(); // Refresh the list
     } catch (e) {
       _error = e.toString();
       notifyListeners();

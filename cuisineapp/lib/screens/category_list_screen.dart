@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/category.dart';
-import '../services/api_service.dart';
+import 'package:provider/provider.dart';
+import '../states/category_provider.dart';
 import 'add_category_screen.dart';
 
 class CategoryListScreen extends StatefulWidget {
@@ -9,25 +9,11 @@ class CategoryListScreen extends StatefulWidget {
 }
 
 class _CategoryListScreenState extends State<CategoryListScreen> {
-  late Future<List<CategoryModel>> _categoriesFuture;
-  final ApiService _apiService = ApiService();
-
   @override
   void initState() {
     super.initState();
-    _categoriesFuture = _fetchCategories();
-  }
-
-  Future<List<CategoryModel>> _fetchCategories() async {
-    try {
-      final response = await _apiService.fetchCategories();
-      return (response as List)
-          .map((item) => CategoryModel.fromJson(item as Map<String, dynamic>))
-          .toList();
-    } catch (e) {
-      print(e);
-      throw Exception('Failed to load categories: $e');
-    }
+    Future.microtask(() =>
+        Provider.of<CategoryProvider>(context, listen: false).fetchCategories());
   }
 
   @override
@@ -45,25 +31,25 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => AddCategoryScreen()),
-              );
+              ).then((value) {
+                if (value == true) {
+                  // Refresh list after adding new category
+                }
+              });
             },
           ),
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () async {
-          setState(() {
-            _categoriesFuture = _fetchCategories();
-          });
-        },
-        child: FutureBuilder<List<CategoryModel>>(
-          future: _categoriesFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (snapshot.hasError) {
+        onRefresh: () =>
+            Provider.of<CategoryProvider>(context, listen: false).refreshCategories(),
+        child: Consumer<CategoryProvider>(
+          builder: (context, provider, child) {
+            if (provider.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (provider.error != null) {
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -71,17 +57,16 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                     const Icon(Icons.error, size: 48, color: Colors.red),
                     const SizedBox(height: 8),
                     Text(
-                      'Error: ${snapshot.error}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.red,
-                      ),
+                      'Error: ${provider.error}',
+                      style: const TextStyle(color: Colors.red),
                       textAlign: TextAlign.center,
                     ),
                   ],
                 ),
               );
-            } else if (snapshot.hasData && snapshot.data!.isEmpty) {
+            }
+
+            if (provider.categories.isEmpty) {
               return const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -95,49 +80,61 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                   ],
                 ),
               );
-            } else {
-              return ListView.builder(
-                padding: const EdgeInsets.all(8.0),
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  final category = snapshot.data![index];
-                  return Card(
-                    elevation: 4,
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ExpansionTile(
-                      leading: Icon(
-                        Icons.category,
-                        color: Theme.of(context).primaryColor,
-                        size: 36,
-                      ),
-                      title: Text(
-                        category.title,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16.0,
-                            vertical: 8.0,
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(8.0),
+              itemCount: provider.categories.length,
+              itemBuilder: (context, index) {
+                final category = provider.categories[index];
+                return Card(
+                  elevation: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 8.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ExpansionTile(
+                    leading: category.imageUrl != null
+                        ? Image.network(
+                            category.imageUrl!,
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                Icon(
+                                  Icons.category,
+                                  color: Theme.of(context).primaryColor,
+                                  size: 36,
+                                ),
+                          )
+                        : Icon(
+                            Icons.category,
+                            color: Theme.of(context).primaryColor,
+                            size: 36,
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Row(
+                    title: Text(
+                      category.title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (category.cuisines.isNotEmpty) ...[
+                              Row(
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.fastfood,
                                     color: Colors.orange,
                                     size: 20,
                                   ),
-                                  SizedBox(width: 8),
-                                  Text(
+                                  const SizedBox(width: 8),
+                                  const Text(
                                     'Cuisines:',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -146,23 +143,29 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                category.cuisines
-                                    .map((c) => c.cuisineTitle)
-                                    .join(', '),
-                                style: const TextStyle(fontSize: 14),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: category.cuisines
+                                    .map((cuisine) => Chip(
+                                          label: Text(cuisine.cuisineTitle),
+                                          backgroundColor: Colors.orange[100],
+                                        ))
+                                    .toList(),
                               ),
                               const SizedBox(height: 16),
-                              const Row(
+                            ],
+                            if (category.subcategories.isNotEmpty) ...[
+                              Row(
                                 children: [
-                                  Icon(
+                                  const Icon(
                                     Icons.subdirectory_arrow_right,
                                     color: Colors.blue,
                                     size: 20,
                                   ),
-                                  SizedBox(width: 8),
-                                  Text(
+                                  const SizedBox(width: 8),
+                                  const Text(
                                     'Subcategories:',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -171,22 +174,26 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                category.subcategories
-                                    .map((s) => s.title)
-                                    .join(', '),
-                                style: const TextStyle(fontSize: 14),
+                              const SizedBox(height: 8),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: category.subcategories
+                                    .map((subcategory) => Chip(
+                                          label: Text(subcategory.title),
+                                          backgroundColor: Colors.blue[100],
+                                        ))
+                                    .toList(),
                               ),
                             ],
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-                },
-              );
-            }
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
           },
         ),
       ),
