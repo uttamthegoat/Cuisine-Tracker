@@ -52,10 +52,6 @@ const CuisineForm = () => {
             formData.append('category_ids', JSON.stringify([]));
         }
 
-        formData.forEach((value, key) => {
-            console.log(`${key}: ${value}`);
-        });
-
         try {
             await dispatch(createCuisineAsync(formData)).unwrap();
             alert('Cuisine created successfully!');
@@ -68,117 +64,126 @@ const CuisineForm = () => {
     };
 
     return (
-        <div className="max-w-lg mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-                Add New Cuisine
-            </h1>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* Cuisine Title */}
-                <div>
-                    <label
-                        htmlFor="cuisine-title"
-                        className="block text-sm font-medium text-gray-700"
-                    >
-                        Cuisine Title *
-                    </label>
-                    <input
-                        type="text"
-                        id="cuisine-title"
-                        placeholder="Enter cuisine title"
-                        {...register('cuisine_title', { 
-                            required: 'Cuisine title is required',
-                            minLength: {
-                                value: 2,
-                                message: 'Title must be at least 2 characters'
-                            },
-                            maxLength: {
-                                value: 50,
-                                message: 'Title must not exceed 50 characters'
-                            }
-                        })}
-                        className={`mt-1 block w-full px-4 py-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500
-                            ${errors.cuisine_title ? 'border-red-500' : 'border-gray-300'}`}
-                    />
-                    {errors.cuisine_title && (
-                        <p className="text-red-500 text-sm mt-1">
-                            {errors.cuisine_title.message}
-                        </p>
-                    )}
+        <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-lg mx-auto bg-white shadow-xl rounded-lg overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-500 to-blue-600 py-6 px-4 sm:px-6">
+                    <h1 className="text-2xl font-bold text-white text-center">
+                        Add New Cuisine
+                    </h1>
                 </div>
+                <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
+                    {/* Cuisine Title */}
+                    <div>
+                        <label
+                            htmlFor="cuisine-title"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Cuisine Title *
+                        </label>
+                        <input
+                            type="text"
+                            id="cuisine-title"
+                            placeholder="Enter cuisine title"
+                            {...register('cuisine_title', { 
+                                required: 'Cuisine title is required',
+                                minLength: {
+                                    value: 2,
+                                    message: 'Title must be at least 2 characters'
+                                },
+                                maxLength: {
+                                    value: 50,
+                                    message: 'Title must not exceed 50 characters'
+                                }
+                            })}
+                            className={`mt-1 block w-full px-4 py-2 bg-white border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out
+                                ${errors.cuisine_title ? 'border-red-500' : 'border-gray-300'}`}
+                        />
+                        {errors.cuisine_title && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.cuisine_title.message}
+                            </p>
+                        )}
+                    </div>
 
-                {/* Categories Selection */}
-                <div>
-                    <label
-                        htmlFor="categories"
-                        className="block text-sm font-medium text-gray-700"
-                    >
-                        Select Categories (Optional)
-                    </label>
-                    <select
-                        id="categories"
-                        {...register('category_ids')}
-                        multiple
-                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    >
-                        {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                                {category.category_title}
-                            </option>
-                        ))}
-                    </select>
-                    <p className="text-sm text-gray-500 mt-2">
-                        Hold down Ctrl (Windows) or Command (Mac) to select multiple options.
-                    </p>
-                </div>
-
-                {/* Image Upload */}
-                <div>
-                    <label
-                        htmlFor="image"
-                        className="block text-sm font-medium text-gray-700"
-                    >
-                        Cuisine Image *
-                    </label>
-                    <input
-                        type="file"
-                        id="image"
-                        {...register('image', { required: 'Image is required' })}
-                        accept="image/*"
-                        onChange={(e) => {
-                            register('image').onChange(e);
-                            handleImageChange(e);
-                        }}
-                        className={`mt-1 block w-full text-sm text-gray-500
-                            file:mr-4 file:py-2 file:px-4
-                            file:rounded-md file:border-0
-                            file:text-sm file:font-semibold
-                            file:bg-blue-50 file:text-blue-700
-                            hover:file:bg-blue-100
-                            ${errors.image ? 'border-red-500' : ''}`}
-                    />
-                    {errors.image && (
-                        <p className="text-red-500 text-sm mt-1">
-                            {errors.image.message}
+                    {/* Categories Selection */}
+                    <div>
+                        <label
+                            htmlFor="categories"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Select Categories (Optional)
+                        </label>
+                        <select
+                            id="categories"
+                            {...register('category_ids')}
+                            multiple
+                            className="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+                        >
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                    {category.category_title}
+                                </option>
+                            ))}
+                        </select>
+                        <p className="text-sm text-gray-500 mt-2">
+                            Hold down Ctrl (Windows) or Command (Mac) to select multiple options.
                         </p>
-                    )}
-                    {previewImage && (
-                        <div className="mt-2">
-                            <img
-                                src={previewImage}
-                                alt="Preview"
-                                className="max-w-xs h-auto rounded-lg shadow-md"
+                    </div>
+
+                    {/* Image Upload */}
+                    <div>
+                        <label
+                            htmlFor="image"
+                            className="block text-sm font-medium text-gray-700"
+                        >
+                            Cuisine Image *
+                        </label>
+                        <div className="mt-1 flex items-center">
+                            <input
+                                type="file"
+                                id="image"
+                                {...register('image', { required: 'Image is required' })}
+                                accept="image/*"
+                                onChange={(e) => {
+                                    register('image').onChange(e);
+                                    handleImageChange(e);
+                                }}
+                                className="hidden"
                             />
+                            <label
+                                htmlFor="image"
+                                className="cursor-pointer bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                            >
+                                Choose file
+                            </label>
+                            <span className="ml-3 text-sm text-gray-500">
+                                {previewImage ? 'Image selected' : 'No file chosen'}
+                            </span>
                         </div>
-                    )}
-                </div>
+                        {errors.image && (
+                            <p className="text-red-500 text-sm mt-1">
+                                {errors.image.message}
+                            </p>
+                        )}
+                        {previewImage && (
+                            <div className="mt-4">
+                                <img
+                                    src={previewImage}
+                                    alt="Preview"
+                                    className="max-w-full h-auto rounded-lg shadow-md"
+                                />
+                            </div>
+                        )}
+                    </div>
 
-                <button
-                    type="submit"
-                    className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200"
-                >
-                    Add Cuisine
-                </button>
-            </form>
+                    <button
+                        type="submit"
+                        className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-4 rounded-md hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                    >
+                        Add Cuisine
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };

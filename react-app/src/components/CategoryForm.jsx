@@ -79,115 +79,126 @@ const CategoryForm = () => {
     };
 
     return (
-        <div className="max-w-3xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
-            <h1 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-                Add New Category
-            </h1>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-                {/* Category Title */}
-                <div>
-                    <label htmlFor="category-title" className="block text-sm font-medium text-gray-700">
-                        Category Title
-                    </label>
-                    <input
-                        id="category-title"
-                        placeholder="Enter category title"
-                        {...register('category_title', { required: 'Category title is required' })}
-                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    />
-                    {errors.category_title && 
-                        <span className="text-red-500 text-sm">{errors.category_title.message}</span>
-                    }
-                </div>
-
-                {/* Image Upload */}
-                <div>
-                    <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-                        Category Image
-                    </label>
-                    <input
-                        type="file"
-                        id="image"
-                        {...register('image', { required: 'Image is required' })}
-                        accept="image/*"
-                        onChange={(e) => {
-                            register('image').onChange(e);
-                            handleImageChange(e);
-                        }}
-                        className="mt-1 block w-full text-sm text-gray-500
-                            file:mr-4 file:py-2 file:px-4
-                            file:rounded-md file:border-0
-                            file:text-sm file:font-semibold
-                            file:bg-blue-50 file:text-blue-700
-                            hover:file:bg-blue-100"
-                    />
-                    {errors.image && 
-                        <span className="text-red-500 text-sm">{errors.image.message}</span>
-                    }
-                    {previewImage && (
-                        <div className="mt-2">
-                            <img 
-                                src={previewImage} 
-                                alt="Preview" 
-                                className="max-w-xs h-auto rounded-lg shadow-md" 
-                            />
-                        </div>
-                    )}
-                </div>
-
-                {/* Cuisines Selection - Updated to be optional */}
-                <div>
-                    <label htmlFor="cuisines" className="block text-sm font-medium text-gray-700">
-                        Select Cuisines (Optional)
-                    </label>
-                    <select
-                        id="cuisines"
-                        {...register('cuisine_ids')}
-                        multiple
-                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    >
-                        {cuisines.map((cuisine) => (
-                            <option key={cuisine.id} value={cuisine.id}>
-                                {cuisine.cuisine_title}
-                            </option>
-                        ))}
-                    </select>
-                    <p className="text-sm text-gray-500 mt-2">
-                        Hold down Ctrl (Windows) or Command (Mac) to select multiple options.
-                    </p>
-                </div>
-
-                {/* Subcategories Selection */}
-                <div>
-                    <label htmlFor="subcategories" className="block text-sm font-medium text-gray-700">
-                        Select Subcategories
-                    </label>
-                    <select
-                        id="subcategories"
-                        {...register('subcategory_ids')}
-                        multiple
-                        className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    >
-                        {subcategories.map((subcategory) => (
-                            <option key={subcategory.id} value={subcategory.id}>
-                                {subcategory.subcategory_title}
-                            </option>
-                        ))}
-                    </select>
-                    {errors.subcategory_ids && 
-                        <span className="text-red-500 text-sm">{errors.subcategory_ids.message}</span>
-                    }
-                </div>
-
-                <button
-                    type="submit"
-                    className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-200"
-                >
-                    Add Category
-                </button>
-            </form>
+  <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-lg overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-500 to-blue-600 py-6 px-4 sm:px-6">
+        <h1 className="text-2xl font-bold text-white text-center">
+          Add New Category
+        </h1>
+      </div>
+      <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
+        {/* Category Title */}
+        <div>
+          <label htmlFor="category-title" className="block text-sm font-medium text-gray-700">
+            Category Title
+          </label>
+          <input
+            id="category-title"
+            placeholder="Enter category title"
+            {...register('category_title', { required: 'Category title is required' })}
+            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out bg-white"
+          />
+          {errors.category_title && 
+            <span className="text-red-500 text-sm mt-1 block">{errors.category_title.message}</span>
+          }
         </div>
-    );
+
+        {/* Image Upload */}
+        <div>
+          <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+            Category Image
+          </label>
+          <div className="mt-1 flex items-center">
+            <input
+              type="file"
+              id="image"
+              {...register('image', { required: 'Image is required' })}
+              accept="image/*"
+              onChange={(e) => {
+                register('image').onChange(e);
+                handleImageChange(e);
+              }}
+              className="hidden"
+            />
+            <label
+              htmlFor="image"
+              className="cursor-pointer bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+            >
+              Choose file
+            </label>
+            <span className="ml-3 text-sm text-gray-500">
+              {previewImage ? 'Image selected' : 'No file chosen'}
+            </span>
+          </div>
+          {errors.image && 
+            <span className="text-red-500 text-sm mt-1 block">{errors.image.message}</span>
+          }
+          {previewImage && (
+            <div className="mt-4">
+              <img 
+                src={previewImage} 
+                alt="Preview" 
+                className="max-w-full h-auto rounded-lg shadow-md" 
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Cuisines Selection */}
+        <div>
+          <label htmlFor="cuisines" className="block text-sm font-medium text-gray-700">
+            Select Cuisines (Optional)
+          </label>
+          <select
+            id="cuisines"
+            {...register('cuisine_ids')}
+            multiple
+            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out bg-white"
+          >
+            {cuisines.map((cuisine) => (
+              <option key={cuisine.id} value={cuisine.id}>
+                {cuisine.cuisine_title}
+              </option>
+            ))}
+          </select>
+          <p className="text-sm text-gray-500 mt-2">
+            Hold down Ctrl (Windows) or Command (Mac) to select multiple options.
+          </p>
+        </div>
+
+        {/* Subcategories Selection */}
+        <div>
+          <label htmlFor="subcategories" className="block text-sm font-medium text-gray-700">
+            Select Subcategories
+          </label>
+          <select
+            id="subcategories"
+            {...register('subcategory_ids')}
+            multiple
+            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out bg-white"
+          >
+            {subcategories.map((subcategory) => (
+              <option key={subcategory.id} value={subcategory.id}>
+                {subcategory.subcategory_title}
+              </option>
+            ))}
+          </select>
+          {errors.subcategory_ids && 
+            <span className="text-red-500 text-sm mt-1 block">{errors.subcategory_ids.message}</span>
+          }
+        </div>
+
+        <button
+          type="submit"
+          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-4 rounded-md hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+        >
+          Add Category
+        </button>
+      </form>
+    </div>
+  </div>
+);
 };
 
 export default CategoryForm;
+
