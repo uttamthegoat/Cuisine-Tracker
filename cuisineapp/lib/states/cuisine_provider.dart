@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/cuisine.dart';
 import '../services/api_service.dart';
 
@@ -47,11 +48,11 @@ class CuisineProvider with ChangeNotifier {
     }
   }
 
-  Future<void> addCuisine(String title, String imagePath, List<int> categoryIds) async {
+  Future<void> addCuisine(String title, XFile image, List<int> categoryIds) async {
     try {
       await _apiService.createCuisine(
         title: title,
-        imagePath: imagePath,
+        image: image,
         categoryIds: categoryIds,
       );
       await refreshCuisines(); // Refresh the list

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
 import '../models/category.dart';
 import '../services/api_service.dart';
 
@@ -48,11 +49,11 @@ class CategoryProvider with ChangeNotifier {
     }
   }
 
-  Future<void> addCategory(String title, String imagePath, List<int> cuisineIds, List<int> subcategoryIds) async {
+  Future<void> addCategory(String title, XFile image, List<int> cuisineIds, List<int> subcategoryIds) async {
     try {
       await _apiService.createCategory(
         title: title,
-        imagePath: imagePath,
+        image: image,
         cuisineIds: cuisineIds,
         subcategoryIds: subcategoryIds,
       );

@@ -1,7 +1,6 @@
 // lib/screens/add_cuisine_screen.dart
 import 'package:cuisineapp/models/category.dart';
 import 'package:cuisineapp/services/api_service.dart';
-import 'package:cuisineapp/states/category_provider.dart';
 import 'package:cuisineapp/states/cuisine_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -67,7 +66,7 @@ class _AddCuisineScreenState extends State<AddCuisineScreen> {
     try {
       await Provider.of<CuisineProvider>(context, listen: false).addCuisine(
         _titleController.text,
-        _image!.path,
+        _image!,
         _selectedCategoryIds,
       );
 

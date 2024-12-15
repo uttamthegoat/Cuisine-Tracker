@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import '../models/subcategory.dart';
+import 'package:http_parser/http_parser.dart';
 
 class ApiService {
   final String baseUrl = "http://192.168.50.41:8000/api";
@@ -25,7 +27,7 @@ class ApiService {
 
   Future<void> createCuisine({
     required String title,
-    required String imagePath,
+    required XFile image,
     required List<int> categoryIds,
   }) async {
     var request = http.MultipartRequest(
@@ -35,7 +37,16 @@ class ApiService {
     
     request.fields['cuisine_title'] = title;
     request.fields['category_ids'] = jsonEncode(categoryIds);
-    request.files.add(await http.MultipartFile.fromPath('image', imagePath));
+    
+    // Add the image file
+    final imageBytes = await image.readAsBytes();
+    final multipartFile = http.MultipartFile.fromBytes(
+      'image',
+      imageBytes,
+      filename: image.name,
+      contentType: MediaType('image', 'jpeg'), // Adjust content type as needed
+    );
+    request.files.add(multipartFile);
     
     var response = await request.send();
     if (response.statusCode != 201) {
@@ -61,25 +72,42 @@ class ApiService {
 
   Future<void> createCategory({
     required String title,
-    required String imagePath,
+    required XFile image,
     required List<int> cuisineIds,
     required List<int> subcategoryIds,
   }) async {
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse('$baseUrl/categories/'),
-    );
-    
-    request.fields['category_title'] = title;
-    request.fields['cuisine_ids'] = jsonEncode(cuisineIds);
-    request.fields['subcategory_ids'] = jsonEncode(subcategoryIds);
-    request.files.add(await http.MultipartFile.fromPath('image', imagePath));
-    
-    var response = await request.send();
-    if (response.statusCode != 201) {
-      final responseBody = await response.stream.bytesToString();
-      print('Error response: $responseBody');
-      throw Exception('Failed to create category: $responseBody');
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/categories/'),
+      );
+      
+      // Add text fields
+      request.fields['category_title'] = title;
+      request.fields['cuisine_ids'] = jsonEncode([cuisineIds]); // Wrap in array as per backend expectation
+      request.fields['subcategory_ids'] = jsonEncode([subcategoryIds]); // Wrap in array as per backend expectation
+      
+      // Add the image file
+      final imageBytes = await image.readAsBytes();
+      final multipartFile = http.MultipartFile.fromBytes(
+        'image',
+        imageBytes,
+        filename: image.name,
+        contentType: MediaType('image', 'jpeg'), // Adjust content type as needed
+      );
+      request.files.add(multipartFile);
+      
+      // Send the request
+      var response = await request.send();
+      
+      if (response.statusCode != 201) {
+        final responseBody = await response.stream.bytesToString();
+        print('Error response: $responseBody');
+        throw Exception('Failed to create category: $responseBody');
+      }
+    } catch (e) {
+      print('Error creating category: $e');
+      throw Exception('Failed to create category: $e');
     }
   }
 

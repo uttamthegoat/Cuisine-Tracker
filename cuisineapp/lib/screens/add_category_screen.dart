@@ -72,7 +72,7 @@ class _AddCategoryScreenState extends State<AddCategoryScreen> {
     try {
       await Provider.of<CategoryProvider>(context, listen: false).addCategory(
         _titleController.text,
-        _image!.path,
+        _image!,
         _selectedCuisineIds,
         _selectedSubcategoryIds,
       );
