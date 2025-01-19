@@ -5,7 +5,7 @@ import '../models/subcategory.dart';
 import 'package:http_parser/http_parser.dart';
 
 class ApiService {
-  final String baseUrl = "http://192.168.50.41:8000/api";
+  final String baseUrl = "http://192.168.232.144:8000/api";
   // final String baseUrl = "http://192.168.137.1:8000/api";
   
   ApiService();

@@ -16,7 +16,7 @@ class CuisineSerializer(serializers.ModelSerializer):
 
     def get_categories(self, obj):
         return [{'id': category.id, 'category_title': category.category_title} for category in obj.categories.all()]
-
+    
     def create(self, validated_data):
         print(f"validated_data: {validated_data}")
         category_ids = validated_data.pop('category_ids', [])
